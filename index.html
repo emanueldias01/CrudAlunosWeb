@@ -1,6 +1,37 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f6f6f6;
+            margin: 40px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 60%;
+            margin: 20px 0;
+            background: #fff;
+            box-shadow: 0 2px 8px #0001;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px 16px;
+            text-align: left;
+        }
+        th {
+            background: #1976d2;
+            color: #fff;
+        }
+        tr:nth-child(even) {
+            background: #f2f2f2;
+        }
+        #media-ira {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #1976d2;
+        }
+    </style>
 </head>
 <body>
     <div id="table-container"></div>
@@ -12,10 +43,10 @@
             .then(alunos => {
                 const table = document.createElement("table");
                 // Cabeçalho
-                const header = table.insertRow();
-                header.insertCell().textContent = "Nome";
-                header.insertCell().textContent = "Curso";
-                header.insertCell().textContent = "IRA";
+                const cabecalho = table.insertRow();
+                cabecalho.insertCell().textContent = "Nome";
+                cabecalho.insertCell().textContent = "Curso";
+                cabecalho.insertCell().textContent = "IRA";
                 // Linhas dos alunos
                 alunos.forEach(aluno => {
                     media += aluno.ira
@@ -25,7 +56,7 @@
                     linha.insertCell().textContent = aluno.ira;
                 });
 
-                media = alunos.length > 0 ? (media / alunos.length).toFixed(2) : 0;
+                media = media / alunos.length
                 document.getElementById("table-container").appendChild(table);
                 document.getElementById('media-ira').innerHTML = `Média IRA: ${media}`
             })
