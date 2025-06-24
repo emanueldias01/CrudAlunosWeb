@@ -36,33 +36,131 @@
 <body>
     <div id="table-container"></div>
     <p id="media-ira"></p>
-    <script>
-        let media = 0
-        fetch('http://localhost:3000/alunos')
-            .then(response => response.json())
-            .then(alunos => {
-                const table = document.createElement("table");
-                // Cabeçalho
-                const cabecalho = table.insertRow();
-                cabecalho.insertCell().textContent = "Nome";
-                cabecalho.insertCell().textContent = "Curso";
-                cabecalho.insertCell().textContent = "IRA";
-                // Linhas dos alunos
-                alunos.forEach(aluno => {
-                    media += aluno.ira
-                    const linha = table.insertRow();
-                    linha.insertCell().textContent = aluno.nome;
-                    linha.insertCell().textContent = aluno.curso;
-                    linha.insertCell().textContent = aluno.ira;
-                });
 
-                media = media / alunos.length
-                document.getElementById("table-container").appendChild(table);
-                document.getElementById('media-ira').innerHTML = `Média IRA: ${media}`
+    <h2>Criar Aluno</h2>
+    <form id="form-criar">
+        <input type="text" id="criar-nome" placeholder="Nome" required>
+        <input type="text" id="criar-curso" placeholder="Curso" required>
+        <input type="number" id="criar-ira" placeholder="IRA" required>
+        <button type="submit">Criar</button>
+    </form>
+
+    <h2>Editar Aluno</h2>
+    <form id="form-editar">
+        <input type="text" id="editar-nome" placeholder="Nome do aluno" required>
+        <input type="text" id="editar-curso" placeholder="Novo Curso">
+        <input type="number" id="editar-ira" placeholder="Novo IRA">
+        <button type="submit">Editar</button>
+    </form>
+
+    <h2>Excluir Aluno</h2>
+    <form id="form-excluir">
+        <input type="text" id="excluir-nome" placeholder="Nome do aluno" required>
+        <button type="submit">Excluir</button>
+    </form>
+    <script>
+        function carregarTabela() {
+            let media = 0;
+            fetch('http://localhost:3000/alunos')
+                .then(response => response.json())
+                .then(alunos => {
+                    const tableContainer = document.getElementById("table-container");
+                    tableContainer.innerHTML = "";
+                    const table = document.createElement("table");
+                    // Cabeçalho
+                    const cabecalho = table.insertRow();
+                    cabecalho.insertCell().textContent = "Nome";
+                    cabecalho.insertCell().textContent = "Curso";
+                    cabecalho.insertCell().textContent = "IRA";
+                    // Linhas dos alunos
+                    alunos.forEach(aluno => {
+                        media += aluno.ira;
+                        const linha = table.insertRow();
+                        linha.insertCell().textContent = aluno.nome;
+                        linha.insertCell().textContent = aluno.curso;
+                        linha.insertCell().textContent = aluno.ira;
+                    });
+
+                    media = alunos.length ? (media / alunos.length).toFixed(2) : 0;
+                    tableContainer.appendChild(table);
+                    document.getElementById('media-ira').innerHTML = `Média IRA: ${media}`;
+                })
+                .catch(erro => {
+                    console.log('erro na requisicão');
+                });
+        }
+
+        carregarTabela();
+
+        // Criar aluno
+        document.getElementById('form-criar').onsubmit = function(e) {
+            e.preventDefault();
+            fetch('http://localhost:3000/alunos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nome: document.getElementById('criar-nome').value,
+                    curso: document.getElementById('criar-curso').value,
+                    ira: Number(document.getElementById('criar-ira').value)
+                })
             })
-            .catch(erro => {
-                console.log('erro na requisicão');
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => { throw new Error(data.mensagem) });
+                }
+                return response.json();
+            })
+            .then(() => {
+                carregarTabela();
+                this.reset();
+            })
+            .catch(error => {
+                alert(error.message);
             });
+        };
+
+        // Editar aluno
+        document.getElementById('form-editar').onsubmit = function(e) {
+            e.preventDefault();
+            fetch('http://localhost:3000/alunos', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nome: document.getElementById('editar-nome').value,
+                    curso: document.getElementById('editar-curso').value,
+                    ira: document.getElementById('editar-ira').value === "" ? undefined : Number(document.getElementById('editar-ira').value)
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => { throw new Error(data.mensagem) });
+                }
+                return response.json();
+            })
+            .then(() => {
+                carregarTabela();
+                this.reset();
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+        };
+
+        // Excluir aluno
+        document.getElementById('form-excluir').onsubmit = function(e) {
+            e.preventDefault();
+            fetch(`http://localhost:3000/alunos/${document.getElementById('excluir-nome').value}`, {
+                method: 'DELETE'
+            })
+
+            .then(() => {
+                carregarTabela();
+                this.reset();
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+        };
     </script>
 </body>
 </html>
