@@ -34,8 +34,8 @@ class AlunoRepository{
         if(aluno.ira !== 0 && aluno.ira !== null) alunoFind.ira = aluno.ira
     }
 
-    static apagar(aluno){
-        const index = this.alunosList.findIndex(a => a.nome === aluno.nome)
+    static apagar(nome){
+        const index = this.alunosList.findIndex(a => a.nome === nome)
         if(index !== -1) throw new Error('Aluno não encontrado')
         this.alunosList.splice(index, 1)
     }
